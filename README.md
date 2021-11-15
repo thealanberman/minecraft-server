@@ -2,13 +2,14 @@
 
 This project attempts to make an easy to use Minecraft server on demand using Terraform and AWS.
 
-The when applied, it will create a modest (but tunable) EC2 instance within minutes which you can then use
+When applied, it will create a modest (but can be configured to be more powerful) EC2 instance within minutes which you can then use
 to host a multiplayer Minecraft server.
 
 In order to keep costs down, the server will automatically self-terminate after 30 minutes of inactivity.
-(Inactivity meaning no one is connected to the server.)
+("Inactivity" meaning no players are connected to the server.)
 
 To further reduce costs, the world data is backed up to S3 just prior to termination... and restored from S3 when the Terraform is reapplied.
+(Just re-apply the Terraform to spin the server back up.)
 
 Downtime costs for the server should be _very_ low, since you're only paying for a few megabytes of S3 storage space.
 
