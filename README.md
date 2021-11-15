@@ -14,7 +14,7 @@ Downtime costs for the server should be _very_ low, since you're only paying for
 
 Uptime costs really just depend on how long your server runs and what size EC2 instance you choose.
 
-# Pre-requisites
+# Prerequisites
 
 - An AWS account.
 - A usable domain registered via Route53.
