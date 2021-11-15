@@ -53,6 +53,7 @@ EOF
 
 cat << EOF > /usr/local/bin/terminate-when-idle
 #!/usr/bin/env bash
+set -x
 IDLE=0
 while [[ \$IDLE -le 30 ]]; do
   if netstat -ntp | grep ESTABLISHED.*java; then
