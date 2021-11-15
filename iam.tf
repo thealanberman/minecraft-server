@@ -32,7 +32,10 @@ data "aws_iam_policy_document" "mcserver" {
       "s3:PutObject",
       "s3:GetObject",
     ]
-    resources = ["${aws_s3_bucket.mcserver.arn}/*"]
+    resources = [
+      "${aws_s3_bucket.mcserver.arn}/*",
+      aws_s3_bucket.mcserver.arn,
+    ]
   }
 
   statement {
