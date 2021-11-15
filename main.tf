@@ -47,7 +47,7 @@ resource "aws_instance" "mcserver" {
   user_data = templatefile(
     "${path.module}/user_data.sh.tpl",
     {
-      s3_bucket_prefix = var.bucket,
+      s3_bucket_prefix = var.bucket_prefix,
       server_jar_url   = var.server_jar_url,
     }
   )

@@ -44,3 +44,14 @@ variable "server_jar_url" {
   type    = string
   default = "https://download.getbukkit.org/spigot/spigot-1.17.1.jar"
 }
+
+variable "versioning" {
+  type        = bool
+  description = "Use S3 versioning on the bucket for backups"
+  default     = false
+}
+
+variable "noncurrent_version_expiration" {
+  type    = number
+  default = 7
+}

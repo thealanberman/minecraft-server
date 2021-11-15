@@ -1,9 +1,9 @@
 resource "aws_s3_bucket" "mcserver" {
-  bucket_prefix = var.bucket
+  bucket_prefix = var.bucket_prefix
   acl           = "private"
 
   versioning {
-    enabled = true
+    enabled = var.versioning
   }
 
   lifecycle_rule {
@@ -11,12 +11,12 @@ resource "aws_s3_bucket" "mcserver" {
     enabled = true
 
     noncurrent_version_expiration {
-      days = 90
+      days = var.noncurrent_version_expiration
     }
   }
 
   tags = {
-    Name    = var.bucket
+    Name    = var.bucket_prefix
     purpose = "minecraft server backups"
   }
 }
