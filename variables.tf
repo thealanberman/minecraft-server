@@ -30,9 +30,9 @@ variable "architecture" {
   default     = "arm64"
 }
 
-variable "bucket" {
+variable "bucket_prefix" {
   type        = string
-  description = "s3 bucket for backups"
+  description = "s3 bucket prefix for backups"
 }
 
 variable "bucket_key" {
