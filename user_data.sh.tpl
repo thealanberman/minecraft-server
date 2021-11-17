@@ -15,15 +15,6 @@ apt update && apt install -y \
   awscli \
   net-tools
 
-# get the bucket name
-s3_bucket=$(/usr/bin/aws s3 ls | grep ${s3_bucket_prefix} | awk '{ print $3 }')
-
-# if there's a backup, restore it
-if /usr/bin/aws s3 ls $s3_bucket | grep -q backup.tgz; then
-  /usr/bin/aws s3 cp s3://$s3_bucket/mcserver/backup.tgz /tmp/
-  tar xvzf /tmp/backup.tgz --directory /opt/minecraft
-fi
-
 # create minecraft server systemd service
 cat << EOF > /etc/systemd/system/minecraft.service
 [Unit]
@@ -49,6 +40,22 @@ ExecStart=/usr/local/bin/terminate-when-idle
 
 [Install]
 WantedBy=multi-user.target
+EOF
+
+# systemd service to run on shutdown
+cat << EOF > /etc/systemd/system/backup-to-s3.service
+[Unit]
+Description=Backup Minecraft data to S3
+DefaultDependencies=no
+Before=halt.target shutdown.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/backup-to-s3
+RemainAfterExit=yes
+
+[Install]
+WantedBy=halt.target shutdown.target
 EOF
 
 cat << EOF > /usr/local/bin/terminate-when-idle
@@ -82,30 +89,38 @@ tar -zc -f /tmp/backup.tgz --exclude *.jar *
 popd
 
 # upload data to S3
-/usr/bin/aws s3 cp /tmp/backup.tgz s3://$s3_bucket/mcserver/
+s3_bucket=$(/usr/bin/aws s3 ls | grep ${s3_bucket_prefix} | awk '{ print $3 }')
+
+/usr/bin/aws s3 cp /tmp/backup.tgz s3://\$s3_bucket/mcserver/
 EOF
 
 chmod +x /usr/local/bin/backup-to-s3
 
-# systemd service to run on shutdown
-cat << EOF > /etc/systemd/system/backup-to-s3.service
-[Unit]
-Description=Backup Minecraft data to S3
-DefaultDependencies=no
-Before=halt.target shutdown.target
+cat << EOF > /usr/local/bin/restore-from-s3
+#!/usr/bin/env bash
+set -x
 
-[Service]
-Type=oneshot
-ExecStart=/usr/local/bin/backup-to-s3
-RemainAfterExit=yes
+# get the bucket name
+s3_bucket=$(/usr/bin/aws s3 ls | grep ${s3_bucket_prefix} | awk '{ print $3 }')
 
-[Install]
-WantedBy=halt.target shutdown.target
+# if there's a backup, restore it
+if /usr/bin/aws s3 ls \$s3_bucket/mcserver/ | grep -q backup.tgz; then
+  /usr/bin/aws s3 cp s3://\$s3_bucket/mcserver/backup.tgz /tmp/
+  tar xvzf /tmp/backup.tgz --directory /opt/minecraft
+  touch /home/ubuntu/backup_restored
+else
+  touch /home/ubuntu/backup_failed
+fi
 EOF
+
+chmod +x /usr/local/bin/restore-from-s3
 
 # reload systemd daemon to pick up service file
 systemctl daemon-reload
 
-# run the systemd service
+# restore from backup, if it exists
+/usr/local/bin/restore-from-s3
+
+# run the systemd services
 systemctl start minecraft.service
 systemctl start terminate-when-idle
