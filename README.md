@@ -29,9 +29,9 @@ Usage of SSH is also beyond the scope of this README.
 # Instructions
 
 1. Clone this repo.
-1. Use `notsketchy.tfvars` as an example and make your own `something.tfvars` with your own preferences.
+1. Use `notsketchy.auto.tfvars` as an example and make your own `something.auto.tfvars` with your own preferences.
 1. `terraform init`
-1. `terraform plan -var-file=something.tfvars`
+1. `terraform plan -var-file=something.auto.tfvars`
 1. `terraform apply`
 
 This should create the following:
@@ -43,7 +43,7 @@ This should create the following:
 
 # More Blathering
 
-Using the `notsketchy.tfvars` example:
+Using the `notsketchy.auto.tfvars` example:
 
 1. It creates a server at mc.notsketchy.click
 1. It is only ssh accessible from the `allow_ssh_cidr` IP address
