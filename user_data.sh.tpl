@@ -80,6 +80,8 @@ cat << EOF > /usr/local/bin/backup-to-s3
 #!/usr/bin/env bash
 set -x
 
+[[ \$EUID == 0 ]] || { echo "must run as root"; exit 1; }
+
 # nuke and pave
 rm -f /tmp/backup.tgz
 
