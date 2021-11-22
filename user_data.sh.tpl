@@ -70,6 +70,7 @@ while [[ \$IDLE -le 30 ]]; do
   fi
   sleep 60
 done
+/usr/local/bin/backup-to-s3
 shutdown now
 EOF
 
@@ -118,6 +119,7 @@ EOF
 chmod +x /usr/local/bin/restore-from-s3
 
 # reload systemd daemon to pick up service file
+systemctl enable backup-to-s3.service
 systemctl daemon-reload
 
 # restore from backup, if it exists
@@ -125,4 +127,4 @@ systemctl daemon-reload
 
 # run the systemd services
 systemctl start minecraft.service
-systemctl start terminate-when-idle
+systemctl start terminate-when-idle.service
